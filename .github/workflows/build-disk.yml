@@ -1,6 +1,14 @@
 name: build-disk
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/build-disk.yml
+  workflow_run:
+    workflows: [build-container]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
     inputs:
       image_ref:
@@ -28,6 +36,7 @@ jobs:
   disk:
     name: Build bootable disk image
     runs-on: ubuntu-latest
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     permissions:
       contents: read
       packages: read
@@ -40,13 +49,32 @@ jobs:
         id: owner
         run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
-      - name: Select image reference
-        id: image
+      - name: Select disk build inputs
+        id: inputs
         run: |
-          if [ -n "${{ github.event.inputs.image_ref }}" ]; then
-            echo "ref=${{ github.event.inputs.image_ref }}" >> "$GITHUB_OUTPUT"
+          image_ref="${{ github.event.inputs.image_ref }}"
+          disk_type="${{ github.event.inputs.disk_type }}"
+
+          if [ -z "${image_ref}" ]; then
+            image_ref="${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/${{ env.IMAGE_NAME }}:latest"
+          fi
+
+          if [ -z "${disk_type}" ]; then
+            disk_type="qcow2"
+          fi
+
+          if [ "${disk_type}" != "qcow2" ] && [ "${disk_type}" != "raw" ]; then
+            echo "Unsupported disk type: ${disk_type}" >&2
+            exit 1
+          fi
+
+          echo "image_ref=${image_ref}" >> "$GITHUB_OUTPUT"
+          echo "disk_type=${disk_type}" >> "$GITHUB_OUTPUT"
+
+          if [ "${disk_type}" = "qcow2" ]; then
+            echo "artifact_path=output/qcow2/disk.qcow2" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/${{ env.IMAGE_NAME }}:latest" >> "$GITHUB_OUTPUT"
+            echo "artifact_path=output/raw/disk.raw" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Free runner disk space
@@ -68,7 +96,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull bootc image
-        run: sudo podman pull "${{ steps.image.outputs.ref }}"
+        run: sudo podman pull "${{ steps.inputs.outputs.image_ref }}"
 
       - name: Build disk image
         run: |
@@ -81,15 +109,15 @@ jobs:
             -v ./output:/output \
             -v /var/lib/containers/storage:/var/lib/containers/storage \
             quay.io/centos-bootc/bootc-image-builder:latest \
-            --type "${{ github.event.inputs.disk_type }}" \
+            --type "${{ steps.inputs.outputs.disk_type }}" \
             --rootfs xfs \
             --use-librepo=True \
-            "${{ steps.image.outputs.ref }}"
+            "${{ steps.inputs.outputs.image_ref }}"
 
       - name: Upload disk artifact
         uses: actions/upload-artifact@v4
         with:
-          name: fedora-workspace-${{ github.event.inputs.disk_type }}
-          path: output/${{ github.event.inputs.disk_type }}/disk.${{ github.event.inputs.disk_type }}
+          name: fedora-workspace-${{ steps.inputs.outputs.disk_type }}
+          path: ${{ steps.inputs.outputs.artifact_path }}
           if-no-files-found: error
           retention-days: 7
