@@ -8,13 +8,23 @@ on:
       - system_files/**
       - .github/workflows/build-container.yml
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Additional image tag"
+        required: false
+        default: ""
 
 env:
   IMAGE_NAME: fedora-workspace
   REGISTRY: ghcr.io
 
+concurrency:
+  group: build-container-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
+    name: Build and push bootc image
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -28,6 +38,15 @@ jobs:
         id: owner
         run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
 
+      - name: Select image tags
+        id: tags
+        run: |
+          tags="latest ${GITHUB_SHA}"
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            tags="${tags} ${{ github.event.inputs.tag }}"
+          fi
+          echo "tags=${tags}" >> "$GITHUB_OUTPUT"
+
       - name: Login to GHCR
         uses: redhat-actions/podman-login@v1
         with:
@@ -40,9 +59,13 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/${{ env.IMAGE_NAME }}
-          tags: latest ${{ github.sha }}
+          tags: ${{ steps.tags.outputs.tags }}
           containerfiles: ./Containerfile
           platforms: linux/amd64
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.title=${{ env.IMAGE_NAME }}
 
       - name: Push bootc image
         uses: redhat-actions/push-to-registry@v2
@@ -50,3 +73,9 @@ jobs:
           image: ${{ steps.build-image.outputs.image }}
           tags: ${{ steps.build-image.outputs.tags }}
           registry: ${{ env.REGISTRY }}
+
+      - name: Print image references
+        run: |
+          for tag in ${{ steps.tags.outputs.tags }}; do
+            echo "${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/${{ env.IMAGE_NAME }}:${tag}"
+          done
