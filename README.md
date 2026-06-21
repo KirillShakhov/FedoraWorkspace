@@ -39,12 +39,32 @@ Edit `Containerfile`:
 ```Dockerfile
 RUN dnf5 install -y \
     openssh-server \
-    neovim \
+    nano \
     zsh \
     && dnf5 clean all
 ```
 
 The base image intentionally does not include deployment-specific agents such as `cloud-init` or `qemu-guest-agent`.
+
+## DevOps Tooling
+
+The base image includes a Fedora-packaged DevOps/development set:
+
+- containers: `moby-engine` (`docker`), `docker-compose`, `docker-compose-switch`;
+- Kubernetes: `kubernetes-client` (`kubectl`), `helm`;
+- infrastructure automation: `opentofu`, `ansible`;
+- cloud/repositories: `gh`;
+- languages/runtime tools for scripting: `golang`, `nodejs`, `npm`, `python3`, `python3-pip`, `python3-virtualenv`;
+- linting/data tools: `ShellCheck`, `yamllint`, `jq`, `yq`;
+- security/secrets: `age`, `sops`, `openssl`;
+- diagnostics: `bind-utils`, `iproute`, `iputils`, `lsof`, `nmap`, `nmap-ncat`, `socat`, `tcpdump`, `traceroute`, `whois`;
+- shell/workflow tools: `direnv`, `just`, `make`, `nano`, `ripgrep`, `tmux`, `tree`, `zsh`, `zstd`.
+
+Nano is the default editor via `system_files/etc/profile.d/editor.sh` and the zsh skeleton config.
+
+## Shell
+
+Bash remains installed for scripts and system compatibility. New users default to zsh via `useradd -D -s /usr/bin/zsh`, and the default zsh theme/config is placed in `system_files/etc/skel/.zshrc`.
 
 ## Git
 
