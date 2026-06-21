@@ -13,6 +13,7 @@ RUN dnf5 install -y \
     bind-utils \
     curl \
     direnv \
+    distrobox \
     docker-compose \
     docker-compose-switch \
     gh \
@@ -65,6 +66,13 @@ RUN systemctl enable \
     NetworkManager.service
 
 RUN useradd -D -s /usr/bin/zsh
+
+RUN useradd \
+    --create-home \
+    --shell /usr/bin/zsh \
+    --groups wheel,docker \
+    kirill \
+    && passwd -l kirill
 
 COPY system_files/ /
 

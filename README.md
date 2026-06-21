@@ -50,7 +50,7 @@ The base image intentionally does not include deployment-specific agents such as
 
 The base image includes a Fedora-packaged DevOps/development set:
 
-- containers: `moby-engine` (`docker`), `docker-compose`, `docker-compose-switch`;
+- containers: `moby-engine` (`docker`), `docker-compose`, `docker-compose-switch`, `distrobox`;
 - Kubernetes: `kubernetes-client` (`kubectl`), `helm`;
 - infrastructure automation: `opentofu`, `ansible`;
 - cloud/repositories: `gh`;
@@ -65,6 +65,18 @@ Nano is the default editor via `system_files/etc/profile.d/editor.sh` and the zs
 ## Shell
 
 Bash remains installed for scripts and system compatibility. New users default to zsh via `useradd -D -s /usr/bin/zsh`, and the default zsh theme/config is placed in `system_files/etc/skel/.zshrc`.
+
+## User
+
+The image creates a `kirill` user with zsh as the login shell and membership in `wheel` and `docker`.
+
+No password or SSH key is baked into the image. For a public repository, keep credentials out of this repo and provide access at install/provisioning time:
+
+- use an installer or target-specific provisioning to set the password;
+- inject SSH keys from the deployment target;
+- keep secrets in a private repo, password manager, or secret manager.
+
+Until that happens, the `kirill` account exists but cannot be used for password login.
 
 ## Git
 
@@ -103,8 +115,8 @@ sudo systemctl reboot
 
 ## Notes
 
-- No default user is baked into the image.
+- The default `kirill` account is locked until a password or SSH access is provisioned.
 - No SSH key is baked into the image.
-- Long-term identity should come from the target platform's provisioning path, installer, or your own system files.
+- Long-term identity should come from the target platform's provisioning path, installer, or your own private system files.
 - The default SSH config disables password login.
 - For private GHCR images, the running machine needs registry credentials before `bootc upgrade` can pull updates.
