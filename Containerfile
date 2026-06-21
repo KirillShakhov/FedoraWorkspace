@@ -5,51 +5,68 @@ LABEL org.opencontainers.image.title="fedora-workspace"
 LABEL org.opencontainers.image.description="Personal Fedora bootc system image"
 LABEL containers.bootc="1"
 
-RUN dnf5 group install -y kde-desktop-environment \
-    && dnf5 install -y sddm \
+# KDE Plasma session, display manager, graphics, audio, and hardware integration.
+RUN dnf5 install -y --setopt=install_weak_deps=False \
+    NetworkManager \
+    NetworkManager-bluetooth \
+    NetworkManager-wifi \
+    alsa-utils \
+    bluez \
+    bluedevil \
+    breeze-cursor-theme \
+    breeze-icon-theme \
+    google-noto-emoji-fonts \
+    google-noto-sans-fonts \
+    kde-settings \
+    kwin \
+    mesa-dri-drivers \
+    mesa-vulkan-drivers \
+    pipewire \
+    plasma-desktop \
+    plasma-nm \
+    plasma-pa \
+    plasma-workspace \
+    polkit-kde \
+    powerdevil \
+    sddm \
+    sddm-wayland-plasma \
+    wireplumber \
+    xdg-desktop-portal \
+    xdg-desktop-portal-kde \
+    xorg-x11-server-Xwayland \
     && dnf5 clean all
 
-RUN dnf5 install -y \
-    ShellCheck \
-    age \
-    ansible \
+# Desktop applications that are useful on the host system.
+RUN dnf5 install -y --setopt=install_weak_deps=False \
+    ark \
+    dolphin \
+    flatpak \
+    flatpak-kcm \
+    konsole \
+    plasma-systemmonitor \
+    && dnf5 clean all
+
+# Base CLI, networking, diagnostics, editor, shell, and SSH tools.
+RUN dnf5 install -y --setopt=install_weak_deps=False \
     bash-completion \
     bind-utils \
     curl \
-    direnv \
-    distrobox \
-    docker-compose \
-    docker-compose-switch \
-    flatpak \
-    gh \
     git \
     git-lfs \
-    golang \
-    helm \
     htop \
     iproute \
     iputils \
-    just \
     jq \
-    kubernetes-client \
     lsof \
     make \
-    moby-engine \
     nano \
     nmap \
     nmap-ncat \
-    nodejs \
-    npm \
     openssh-server \
     openssl \
-    opentofu \
-    python3 \
-    python3-pip \
-    python3-virtualenv \
     ripgrep \
     rsync \
     socat \
-    sops \
     sudo \
     tailscale \
     tcpdump \
@@ -59,10 +76,41 @@ RUN dnf5 install -y \
     unzip \
     wget \
     whois \
-    yamllint \
     yq \
     zsh \
     zstd \
+    && dnf5 clean all
+
+# Docker-first container stack and Distrobox.
+RUN dnf5 install -y --setopt=install_weak_deps=False \
+    docker-buildx \
+    docker-compose \
+    docker-compose-switch \
+    distrobox \
+    moby-engine \
+    && dnf5 clean all
+
+# DevOps and infrastructure tools.
+RUN dnf5 install -y --setopt=install_weak_deps=False \
+    ShellCheck \
+    age \
+    ansible \
+    direnv \
+    gh \
+    helm \
+    just \
+    kubernetes-client \
+    opentofu \
+    yamllint \
+    && dnf5 clean all
+
+# Language runtimes for host-level tooling.
+RUN dnf5 install -y --setopt=install_weak_deps=False \
+    nodejs \
+    npm \
+    python3 \
+    python3-pip \
+    python3-virtualenv \
     && dnf5 clean all
 
 RUN systemctl enable \
@@ -75,17 +123,19 @@ RUN systemctl set-default graphical.target
 
 RUN useradd -D -s /usr/bin/zsh
 
-RUN useradd \
+RUN mkdir -p /var/home \
+    && useradd \
     --create-home \
     --shell /usr/bin/zsh \
     --groups wheel,docker \
     kirill \
     && passwd -l kirill
 
-COPY system_files/ /
+COPY system_files/etc/ /etc/
+COPY system_files/usr/ /usr/
 
-RUN chown -R kirill:kirill /home/kirill/.ssh \
-    && chmod 700 /home/kirill/.ssh \
-    && chmod 600 /home/kirill/.ssh/authorized_keys
+RUN install -d -m 700 -o kirill -g kirill /var/home/kirill/.ssh
+
+COPY --chown=kirill:kirill --chmod=600 system_files/home/kirill/.ssh/authorized_keys /var/home/kirill/.ssh/authorized_keys
 
 RUN bootc container lint
