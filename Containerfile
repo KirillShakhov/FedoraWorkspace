@@ -104,8 +104,16 @@ RUN dnf5 install -y --setopt=install_weak_deps=False \
     yamllint \
     && dnf5 clean all
 
-# Language runtimes for host-level tooling.
+# Host language runtimes and native build toolchain.
 RUN dnf5 install -y --setopt=install_weak_deps=False \
+    clang \
+    cmake \
+    gcc \
+    gcc-c++ \
+    gdb \
+    golang \
+    lldb \
+    ninja-build \
     nodejs \
     npm \
     python3 \

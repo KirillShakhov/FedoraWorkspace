@@ -56,9 +56,9 @@ The base image includes a Fedora-packaged DevOps/development set:
 - Kubernetes: `kubernetes-client` (`kubectl`), `helm`;
 - infrastructure automation: `opentofu`, `ansible`;
 - cloud/repositories: `gh`;
-- languages/runtime tools for scripting: `golang`, `nodejs`, `npm`, `python3`, `python3-pip`, `python3-virtualenv`;
+- host language runtimes and native build toolchain: `clang`, `cmake`, `gcc`, `gcc-c++`, `gdb`, `golang`, `lldb`, `ninja-build`, `nodejs`, `npm`, `python3`, `python3-pip`, `python3-virtualenv`;
 - linting/data tools: `ShellCheck`, `yamllint`, `jq`, `yq`;
-- security/secrets: `age`, `sops`, `openssl`;
+- security/crypto tools: `age`, `openssl`;
 - diagnostics: `bind-utils`, `iproute`, `iputils`, `lsof`, `nmap`, `nmap-ncat`, `socat`, `tcpdump`, `traceroute`, `whois`;
 - desktop/app runtime: `flatpak`;
 - shell/workflow tools: `direnv`, `just`, `make`, `nano`, `ripgrep`, `tmux`, `tree`, `zsh`, `zstd`.
@@ -67,7 +67,7 @@ Nano is the default editor via `system_files/etc/profile.d/editor.sh` and the zs
 
 ## Desktop
 
-The image installs Fedora's `kde-desktop-environment` package group, enables `sddm.service`, and sets the default systemd target to `graphical.target`.
+The image installs a focused KDE Plasma package set, enables `sddm.service`, and sets the default systemd target to `graphical.target`.
 
 ## Desktop IDEs
 
