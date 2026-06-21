@@ -5,6 +5,10 @@ LABEL org.opencontainers.image.title="fedora-workspace"
 LABEL org.opencontainers.image.description="Personal Fedora bootc system image"
 LABEL containers.bootc="1"
 
+RUN dnf5 group install -y kde-desktop-environment \
+    && dnf5 install -y sddm \
+    && dnf5 clean all
+
 RUN dnf5 install -y \
     ShellCheck \
     age \
@@ -64,7 +68,10 @@ RUN dnf5 install -y \
 RUN systemctl enable \
     docker.service \
     sshd.service \
-    NetworkManager.service
+    NetworkManager.service \
+    sddm.service
+
+RUN systemctl set-default graphical.target
 
 RUN useradd -D -s /usr/bin/zsh
 

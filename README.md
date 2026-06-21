@@ -2,6 +2,8 @@
 
 Personal Fedora bootc system image.
 
+Desktop environment: KDE Plasma.
+
 This repository builds:
 
 - a bootable Fedora OCI image published to GitHub Container Registry;
@@ -62,6 +64,10 @@ The base image includes a Fedora-packaged DevOps/development set:
 - shell/workflow tools: `direnv`, `just`, `make`, `nano`, `ripgrep`, `tmux`, `tree`, `zsh`, `zstd`.
 
 Nano is the default editor via `system_files/etc/profile.d/editor.sh` and the zsh skeleton config.
+
+## Desktop
+
+The image installs Fedora's `kde-desktop-environment` package group, enables `sddm.service`, and sets the default systemd target to `graphical.target`.
 
 ## Desktop IDEs
 
