@@ -84,4 +84,8 @@ RUN useradd \
 
 COPY system_files/ /
 
+RUN chown -R kirill:kirill /home/kirill/.ssh \
+    && chmod 700 /home/kirill/.ssh \
+    && chmod 600 /home/kirill/.ssh/authorized_keys
+
 RUN bootc container lint

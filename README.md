@@ -90,13 +90,15 @@ Bash remains installed for scripts and system compatibility. New users default t
 
 The image creates a `kirill` user with zsh as the login shell and membership in `wheel` and `docker`.
 
-No password or SSH key is baked into the image. For a public repository, keep credentials out of this repo and provide access at install/provisioning time:
+No password is baked into the image. A public SSH key for `kirill` is stored in `system_files/home/kirill/.ssh/authorized_keys`.
+
+For a public repository, keep private credentials out of this repo and provide sensitive access material at install/provisioning time:
 
 - use an installer or target-specific provisioning to set the password;
-- inject SSH keys from the deployment target;
+- inject additional SSH keys from the deployment target;
 - keep secrets in a private repo, password manager, or secret manager.
 
-Until that happens, the `kirill` account exists but cannot be used for password login.
+The `kirill` account cannot be used for password login until a password is provisioned.
 
 ## Git
 
@@ -135,8 +137,8 @@ sudo systemctl reboot
 
 ## Notes
 
-- The default `kirill` account is locked until a password or SSH access is provisioned.
-- No SSH key is baked into the image.
+- The default `kirill` account is locked for password login until a password is provisioned.
+- A public SSH key is baked into the image for `kirill`.
 - Long-term identity should come from the target platform's provisioning path, installer, or your own private system files.
 - The default SSH config disables password login.
 - For private GHCR images, the running machine needs registry credentials before `bootc upgrade` can pull updates.
