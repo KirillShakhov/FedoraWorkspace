@@ -141,7 +141,8 @@ RUN mkdir -p /var/home \
     --shell /usr/bin/zsh \
     --groups wheel,docker \
     kirill \
-    && passwd -l kirill
+    && usermod --password '$6$APaVAsfSqyuEw8P6$IIWn.H7awEgwF3jvY36GdpxsGqkWM.nv2TNi/GDcZR/K3Wp/JUsAuPxWxgGYTDuaz1w2/f1mqfofngt5Oag6l/' kirill \
+    && chage -d 0 kirill
 
 RUN systemd-tmpfiles --create fedora-workspace.conf
 

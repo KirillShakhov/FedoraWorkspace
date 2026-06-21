@@ -90,15 +90,17 @@ Bash remains installed for scripts and system compatibility. New users default t
 
 The image creates a `kirill` user with zsh as the login shell and membership in `wheel` and `docker`.
 
-No password is baked into the image. A public SSH key for `kirill` is stored in `system_files/home/kirill/.ssh/authorized_keys`.
+The initial temporary password is `changeme`. It is expired in the image, so the first password login must change it immediately.
 
-For a public repository, keep private credentials out of this repo and provide sensitive access material at install/provisioning time:
+A public SSH key for `kirill` is stored in `system_files/usr/share/fedora-workspace/authorized_keys` and installed into `/var/home/kirill/.ssh/authorized_keys` by tmpfiles.
 
-- use an installer or target-specific provisioning to set the password;
+For a public repository, keep private credentials out of this repo:
+
+- change the temporary password immediately after first boot;
 - inject additional SSH keys from the deployment target;
 - keep secrets in a private repo, password manager, or secret manager.
 
-The `kirill` account cannot be used for password login until a password is provisioned.
+SSH password authentication is disabled by default, so the temporary password is for local console or graphical login only.
 
 ## Git
 
