@@ -16,6 +16,7 @@ RUN dnf5 install -y \
     distrobox \
     docker-compose \
     docker-compose-switch \
+    flatpak \
     gh \
     git \
     git-lfs \

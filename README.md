@@ -58,9 +58,23 @@ The base image includes a Fedora-packaged DevOps/development set:
 - linting/data tools: `ShellCheck`, `yamllint`, `jq`, `yq`;
 - security/secrets: `age`, `sops`, `openssl`;
 - diagnostics: `bind-utils`, `iproute`, `iputils`, `lsof`, `nmap`, `nmap-ncat`, `socat`, `tcpdump`, `traceroute`, `whois`;
+- desktop/app runtime: `flatpak`;
 - shell/workflow tools: `direnv`, `just`, `make`, `nano`, `ripgrep`, `tmux`, `tree`, `zsh`, `zstd`.
 
 Nano is the default editor via `system_files/etc/profile.d/editor.sh` and the zsh skeleton config.
+
+## Desktop IDEs
+
+VS Code and IntelliJ IDEA Community are installed as Flatpaks after deployment, not baked into the base OS image. Run:
+
+```bash
+sudo install-flatpack-apps
+```
+
+That script adds Flathub as a system remote and installs:
+
+- `com.visualstudio.code`
+- `com.jetbrains.IntelliJ-IDEA-Community`
 
 ## Shell
 

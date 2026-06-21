@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${EUID}" -ne 0 ]]; then
+  echo "Run as root: sudo install-flatpack-apps" >&2
+  exit 1
+fi
+
+flatpak remote-add --system --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+flatpak install --system -y flathub \
+  com.visualstudio.code \
+  com.jetbrains.IntelliJ-IDEA-Community
