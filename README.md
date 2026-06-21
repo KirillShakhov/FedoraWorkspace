@@ -46,6 +46,10 @@ RUN dnf5 install -y \
 
 The base image intentionally does not include deployment-specific agents such as `cloud-init` or `qemu-guest-agent`.
 
+## Git
+
+Git is installed in the base image. The system-wide defaults live in `system_files/etc/gitconfig`.
+
 ## Deployment Targets
 
 - Proxmox: see `deploy/proxmox/README.md`.

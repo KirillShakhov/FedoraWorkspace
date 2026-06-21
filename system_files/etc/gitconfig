@@ -1,0 +1,6 @@
+[user]
+	name = KirillShakhov
+	email = kirill.shakhov14@gmail.com
+
+[core]
+	autocrlf = input
