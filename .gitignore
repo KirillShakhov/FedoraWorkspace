@@ -1,0 +1,34 @@
+.DS_Store
+
+# OS/editor noise
+Thumbs.db
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Local env files and secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local build output
+output/
+outputs/
+*.log
+*.tmp
+
+# Generated disk/install artifacts
+*.qcow2
+*.raw
+*.iso
+*.vmdk
+*.img
+
+# Container/build cache
+.cache/
+containers-storage/
