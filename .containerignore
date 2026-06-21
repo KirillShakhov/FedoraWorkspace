@@ -1,0 +1,8 @@
+.git
+.github
+README.md
+output
+*.qcow2
+*.raw
+*.iso
+*.log
