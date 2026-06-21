@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ "${EUID}" -ne 0 ]]; then
-  echo "Run as root: sudo install-flatpack-apps" >&2
+  echo "Run as root: sudo install-flatpak-apps" >&2
   exit 1
 fi
 

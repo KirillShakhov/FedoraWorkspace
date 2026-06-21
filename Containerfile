@@ -129,21 +129,43 @@ RUN systemctl enable \
 
 RUN systemctl set-default graphical.target
 
+COPY system_files/etc/ /etc/
+COPY system_files/usr/ /usr/
+
 RUN useradd -D -s /usr/bin/zsh
 
 RUN mkdir -p /var/home \
     && useradd \
-    --create-home \
+    --no-create-home \
+    --home-dir /var/home/kirill \
     --shell /usr/bin/zsh \
     --groups wheel,docker \
     kirill \
     && passwd -l kirill
 
-COPY system_files/etc/ /etc/
-COPY system_files/usr/ /usr/
+RUN systemd-tmpfiles --create fedora-workspace.conf
 
-RUN install -d -m 700 -o kirill -g kirill /var/home/kirill/.ssh
-
-COPY --chown=kirill:kirill --chmod=600 system_files/home/kirill/.ssh/authorized_keys /var/home/kirill/.ssh/authorized_keys
+RUN rm -rf \
+    /run/dnf \
+    /run/sddm \
+    /run/selinux-policy \
+    /tmp/* \
+    /var/cache/libX11 \
+    /var/cache/libdnf5 \
+    /var/cache/ldconfig/aux-cache \
+    /var/cache/swcatalog \
+    /var/cache/tailscale \
+    /var/lib/AccountsService \
+    /var/lib/alsa \
+    /var/lib/authselect \
+    /var/lib/authselect/checksum \
+    /var/lib/dnf/repos/*/countme \
+    /var/lib/dnf/repos \
+    /var/lib/dnf/system-repo.lock \
+    /var/lib/flatpak \
+    /var/lib/geoclue \
+    /var/lib/rpm-state \
+    /var/lib/tailscale \
+    /var/log/dnf5.log*
 
 RUN bootc container lint

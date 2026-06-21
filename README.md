@@ -74,7 +74,7 @@ The image installs a focused KDE Plasma package set, enables `sddm.service`, and
 VS Code and IntelliJ IDEA Community are installed as Flatpaks after deployment, not baked into the base OS image. Run:
 
 ```bash
-sudo install-flatpack-apps
+sudo install-flatpak-apps
 ```
 
 That script adds Flathub as a system remote and installs:
