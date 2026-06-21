@@ -22,10 +22,9 @@ The target machine is not running inside a container. The OCI image is the trans
 
 1. Create a new GitHub repository.
 2. Copy these files into it.
-3. Replace the SSH key in `disk_config/config.toml`, or remove the baked `admin` user and rely on your target platform's provisioning.
-4. Push to `main`.
-5. Run the `build-container` workflow.
-6. Optionally run the `build-disk` workflow to produce a `qcow2` disk.
+3. Push to `main`.
+4. Run the `build-container` workflow.
+5. Optionally run the `build-disk` workflow to produce a `qcow2` disk.
 
 The container image will be published as:
 
@@ -39,23 +38,21 @@ Edit `Containerfile`:
 
 ```Dockerfile
 RUN dnf5 install -y \
-    qemu-guest-agent \
-    cloud-init \
     openssh-server \
     neovim \
     zsh \
     && dnf5 clean all
 ```
 
-Keep `cloud-init` and `openssh-server` if you want cloud or VM provisioning. Keep `qemu-guest-agent` when this image will run under QEMU/KVM environments such as Proxmox, libvirt, or plain QEMU.
+The base image intentionally does not include deployment-specific agents such as `cloud-init` or `qemu-guest-agent`.
 
 ## Deployment Targets
 
 - Proxmox: see `deploy/proxmox/README.md`.
-- Other QEMU/KVM hosts: use the `qcow2` artifact directly.
+- Other QEMU/KVM hosts: use the `qcow2` artifact directly, or create a target-specific variant.
 - Existing bootc system: switch to the image with `bootc switch`.
 - Existing Fedora Atomic/rpm-ostree system: rebase using the matching signed or unsigned image flow for that system.
-- Bare metal: build an installer or disk image with image-builder/bootc-image-builder and install it to the target disk.
+- Bare metal: build an installer or disk image and handle user creation through your chosen install/provisioning flow.
 
 ## Updating
 
@@ -82,7 +79,8 @@ sudo systemctl reboot
 
 ## Notes
 
-- `disk_config/config.toml` is for generated disk images. It currently creates an SSH-key-only `admin` user as a fallback.
-- Long-term identity should come from the target platform's provisioning path, not hardcoded passwords.
+- No default user is baked into the image.
+- No SSH key is baked into the image.
+- Long-term identity should come from the target platform's provisioning path, installer, or your own system files.
 - The default SSH config disables password login.
 - For private GHCR images, the running machine needs registry credentials before `bootc upgrade` can pull updates.

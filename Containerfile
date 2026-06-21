@@ -7,7 +7,6 @@ LABEL containers.bootc="1"
 
 RUN dnf5 install -y \
     bash-completion \
-    cloud-init \
     curl \
     git \
     htop \
@@ -16,7 +15,6 @@ RUN dnf5 install -y \
     neovim \
     openssh-server \
     podman \
-    qemu-guest-agent \
     rsync \
     sudo \
     tailscale \
@@ -26,14 +24,7 @@ RUN dnf5 install -y \
     zsh \
     && dnf5 clean all
 
-# Enable baseline services that are useful on VMs and bare-metal installs.
-# cloud-init is inert unless a supported datasource is attached.
 RUN systemctl enable \
-    cloud-init-local.service \
-    cloud-init.service \
-    cloud-config.service \
-    cloud-final.service \
-    qemu-guest-agent.service \
     sshd.service \
     NetworkManager.service
 
